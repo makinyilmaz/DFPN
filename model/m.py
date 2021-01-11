@@ -8,8 +8,6 @@ import torch.nn.functional as F
 from torch.nn import init
 import math
 import torchvision.ops.deform_conv as df
-from .cbam import CBAM
-
 
 
 def conv_same(in_ch,out_ch,kernel_size):
