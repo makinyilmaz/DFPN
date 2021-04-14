@@ -21,7 +21,7 @@ from model import m
 
 logging.basicConfig(filename="result.log",level=logging.INFO)
 
-device = torch.device("cuda:1")
+device = torch.device("cuda")
 
 def test_data_loader(path="mpeg/"):
     folders = natsorted(glob.glob(path+"*"))
@@ -111,15 +111,6 @@ def test_and_save(model):
     
     return fps
 
-
-def load_pre_model(m, path, requires_grad):
-    pre_dict = torch.load(path, map_location=lambda storage, loc: storage)["state_dict"]
-    m_dict = m.state_dict()
-    m_dict.update(pre_dict)
-    m.load_state_dict(m_dict)
-    for p in m.parameters():
-        p.requires_grad = requires_grad
-    return m
 
 def main():
     path = "dfpn.pth"
