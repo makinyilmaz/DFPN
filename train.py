@@ -1,9 +1,3 @@
-
-# coding: utf-8
-
-# In[ ]:
-
-
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -26,7 +20,7 @@ from model import m
 
 logging.basicConfig(filename="pred.log",level=logging.INFO)
 
-device = torch.device("cuda:2")
+device = torch.device("cuda")
 
 def video_list(path="/home/ml/Akin/UCF/"):
     videos = natsorted(glob.glob(path+"*"))    
@@ -176,7 +170,6 @@ def test_and_save(model):
             video_ssim = 0
 
             d = 5
-            os.makedirs("Created/"+folder_names[folder],exist_ok=True)
 
             for frame in range(m):
                 inp = normalize(torch.from_numpy(X_test[frame:frame+1]).to(device).float())
@@ -190,8 +183,6 @@ def test_and_save(model):
                 psnr = compare_psnr(uint8_real,uint8_out,data_range=255)
                 video_psnr += psnr
 
-                save_path = "Created/"+folder_names[folder]+"/frame"+str(d)+".png"
-                imageio.imsave(save_path,uint8_out)
                 d += 1
                 total_frames += 1
 
@@ -239,18 +230,13 @@ def main():
     random.seed(3)
     
     
-    total_train_step = 100000
+    total_train_step = 500000
     train_step = 2000
-    lr_step = 200000
+    lr_step = 100000
     
-    learning_rate = 1.e-6
-            
-    path = "/home/ml/Akin/Frame_Prediction_v2/res_sc_mae.pth"
-    
+    learning_rate = 1.e-4
+           
     model = m.Model()
-    model.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage)["state_dict"])
-    for p in model.parameters():
-        p.requires_grad = True
     
     model_parameters = filter(lambda p: p.requires_grad, model.parameters())
     params = sum([np.prod(p.size()) for p in model_parameters])
@@ -263,14 +249,14 @@ def main():
 
     average_train_loss = 0    
 
-    best_test_psnr = 31.140535753006173
+    best_test_psnr = 0
 
     all_videos = video_list()
     
     logging.info("train video samples: "+str(len(all_videos)))
     logging.info("**********")
 
-    batch_size = 5
+    batch_size = 8
     
     time_start = time.time()
     for minibatch_processed in range(1,total_train_step+1):
@@ -321,7 +307,6 @@ def main():
     logging.info("day:hour:minute:second-> %d:%d:%d:%d" % (day, hour, minutes, seconds))
 
 
-# In[ ]:
 
 
 main()
